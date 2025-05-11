@@ -1,10 +1,11 @@
 using UnityEngine;
-using UnityEngine.InputSystem; // required for new input system
+using UnityEngine.InputSystem; // new Input System
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerMovement : MonoBehaviour
 {
     public float moveSpeed = 5f;
+    public float sprintMultiplier = 1.5f;
     public float jumpForce = 7f;
 
     private Rigidbody rb;
@@ -24,7 +25,15 @@ public class PlayerMovement : MonoBehaviour
         if (Keyboard.current.aKey.isPressed) move -= transform.right;
         if (Keyboard.current.dKey.isPressed) move += transform.right;
 
-        Vector3 velocity = new Vector3(move.normalized.x * moveSpeed, rb.linearVelocity.y, move.normalized.z * moveSpeed);
+        float currentSpeed = moveSpeed;
+
+        // Sprint when Left Shift is held
+        if (Keyboard.current.leftShiftKey.isPressed)
+        {
+            currentSpeed *= sprintMultiplier;
+        }
+
+        Vector3 velocity = new Vector3(move.normalized.x * currentSpeed, rb.linearVelocity.y, move.normalized.z * currentSpeed);
         rb.linearVelocity = velocity;
     }
 
