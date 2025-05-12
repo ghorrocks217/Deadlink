@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.InputSystem; // new Input System
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerMovement : MonoBehaviour
@@ -7,37 +7,49 @@ public class PlayerMovement : MonoBehaviour
     public float moveSpeed = 5f;
     public float sprintMultiplier = 1.5f;
     public float jumpForce = 7f;
+    public float groundCheckDistance = 0.6f;
+    public LayerMask groundLayer;
 
     private Rigidbody rb;
     private bool isGrounded;
+    private Vector3 groundNormal = Vector3.up;
 
-    void Start()
+    private void Start()
     {
         rb = GetComponent<Rigidbody>();
+        rb.freezeRotation = true; // Prevent rotation from collisions
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        Vector3 move = Vector3.zero;
+        UpdateGroundStatus();
 
-        if (Keyboard.current.wKey.isPressed) move += transform.forward;
-        if (Keyboard.current.sKey.isPressed) move -= transform.forward;
-        if (Keyboard.current.aKey.isPressed) move -= transform.right;
-        if (Keyboard.current.dKey.isPressed) move += transform.right;
+        Vector3 inputDir = Vector3.zero;
+        if (Keyboard.current.wKey.isPressed) inputDir += transform.forward;
+        if (Keyboard.current.sKey.isPressed) inputDir -= transform.forward;
+        if (Keyboard.current.aKey.isPressed) inputDir -= transform.right;
+        if (Keyboard.current.dKey.isPressed) inputDir += transform.right;
+
+        inputDir = inputDir.normalized;
 
         float currentSpeed = moveSpeed;
-
-        // Sprint when Left Shift is held
         if (Keyboard.current.leftShiftKey.isPressed)
         {
             currentSpeed *= sprintMultiplier;
         }
 
-        Vector3 velocity = new Vector3(move.normalized.x * currentSpeed, rb.linearVelocity.y, move.normalized.z * currentSpeed);
+        // Project movement on slope
+        Vector3 moveDir = Vector3.ProjectOnPlane(inputDir, groundNormal).normalized;
+        Vector3 targetVelocity = moveDir * currentSpeed;
+
+        Vector3 velocity = rb.linearVelocity;
+        velocity.x = targetVelocity.x;
+        velocity.z = targetVelocity.z;
+
         rb.linearVelocity = velocity;
     }
 
-    void Update()
+    private void Update()
     {
         if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded)
         {
@@ -46,11 +58,18 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void OnCollisionEnter(Collision collision)
+    private void UpdateGroundStatus()
     {
-        if (collision.contacts[0].normal.y > 0.5f)
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, groundCheckDistance, groundLayer))
         {
             isGrounded = true;
+            groundNormal = hit.normal;
+        }
+        else
+        {
+            isGrounded = false;
+            groundNormal = Vector3.up;
         }
     }
 }
