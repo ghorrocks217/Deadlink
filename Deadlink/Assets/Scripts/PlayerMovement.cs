@@ -1,75 +1,128 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Rigidbody), typeof(CapsuleCollider))]
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Movement Settings")]
     public float moveSpeed = 5f;
-    public float sprintMultiplier = 1.5f;
+    public float sprintSpeed = 8f;
+    public float slideSpeed = 10f;
     public float jumpForce = 7f;
-    public float groundCheckDistance = 0.6f;
-    public LayerMask groundLayer;
+
+    [Header("Slide Settings")]
+    public float slideDuration = 1f;
+    public float slideEndSpeedThreshold = 0.5f;
+    public float slideHeight = 1f;
+    public float slideTiltAngle = 15f;
+
+    [Header("References")]
+    public Transform cameraTransform;
+    public ParticleSystem slideParticles;
+    public AudioSource slideSound;
 
     private Rigidbody rb;
-    private bool isGrounded;
-    private Vector3 groundNormal = Vector3.up;
+    private CapsuleCollider col;
 
-    private void Start()
+    private bool isGrounded;
+    private bool isSliding;
+    private float slideTimer;
+
+    private float originalHeight;
+    private Vector3 originalCenter;
+    private Quaternion originalCamRotation;
+
+    void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.freezeRotation = true; // Prevent rotation from collisions
+        col = GetComponent<CapsuleCollider>();
+
+        originalHeight = col.height;
+        originalCenter = col.center;
+
+        if (cameraTransform != null)
+            originalCamRotation = cameraTransform.localRotation;
     }
 
-    private void FixedUpdate()
+    void FixedUpdate()
     {
-        UpdateGroundStatus();
+        Vector3 move = Vector3.zero;
 
-        Vector3 inputDir = Vector3.zero;
-        if (Keyboard.current.wKey.isPressed) inputDir += transform.forward;
-        if (Keyboard.current.sKey.isPressed) inputDir -= transform.forward;
-        if (Keyboard.current.aKey.isPressed) inputDir -= transform.right;
-        if (Keyboard.current.dKey.isPressed) inputDir += transform.right;
+        if (Keyboard.current.wKey.isPressed) move += transform.forward;
+        if (Keyboard.current.sKey.isPressed) move -= transform.forward;
+        if (Keyboard.current.aKey.isPressed) move -= transform.right;
+        if (Keyboard.current.dKey.isPressed) move += transform.right;
 
-        inputDir = inputDir.normalized;
+        move.Normalize();
 
-        float currentSpeed = moveSpeed;
-        if (Keyboard.current.leftShiftKey.isPressed)
-        {
-            currentSpeed *= sprintMultiplier;
-        }
+        float currentSpeed = isSliding ? slideSpeed :
+                             (Keyboard.current.leftShiftKey.isPressed ? sprintSpeed : moveSpeed);
 
-        // Project movement on slope
-        Vector3 moveDir = Vector3.ProjectOnPlane(inputDir, groundNormal).normalized;
-        Vector3 targetVelocity = moveDir * currentSpeed;
-
-        Vector3 velocity = rb.linearVelocity;
-        velocity.x = targetVelocity.x;
-        velocity.z = targetVelocity.z;
-
+        Vector3 velocity = new Vector3(move.x * currentSpeed, rb.linearVelocity.y, move.z * currentSpeed);
         rb.linearVelocity = velocity;
     }
 
-    private void Update()
+    void Update()
     {
-        if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded)
+        if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded && !isSliding)
         {
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
             isGrounded = false;
         }
+
+        if (Keyboard.current.leftCtrlKey.wasPressedThisFrame && isGrounded && rb.linearVelocity.magnitude > 3f)
+        {
+            StartSlide();
+        }
+
+        if (isSliding)
+        {
+            slideTimer -= Time.deltaTime;
+
+            if (slideTimer <= 0f || rb.linearVelocity.magnitude < slideEndSpeedThreshold)
+            {
+                StopSlide();
+            }
+
+            if (cameraTransform != null)
+            {
+                cameraTransform.localRotation = Quaternion.Euler(slideTiltAngle, 0f, 0f);
+            }
+        }
     }
 
-    private void UpdateGroundStatus()
+    void StartSlide()
     {
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, Vector3.down, out hit, groundCheckDistance, groundLayer))
+        if (isSliding) return;
+
+        isSliding = true;
+        slideTimer = slideDuration;
+
+        col.height = slideHeight;
+        col.center = new Vector3(originalCenter.x, slideHeight / 2f, originalCenter.z);
+
+        if (slideParticles != null) slideParticles.Play();
+        if (slideSound != null) slideSound.Play();
+    }
+
+    void StopSlide()
+    {
+        if (!isSliding) return;
+
+        isSliding = false;
+
+        col.height = originalHeight;
+        col.center = originalCenter;
+
+        if (cameraTransform != null)
+            cameraTransform.localRotation = originalCamRotation;
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.contacts[0].normal.y > 0.5f)
         {
             isGrounded = true;
-            groundNormal = hit.normal;
-        }
-        else
-        {
-            isGrounded = false;
-            groundNormal = Vector3.up;
         }
     }
 }
