@@ -1,0 +1,62 @@
+{
+  "layouts": [
+    {
+      "element": "Title",
+      "position": { "x": 0, "y": 220 },
+      "size": { "x": 500, "y": 70 },
+      "anchorMin": { "x": 0.5, "y": 0.5 },
+      "anchorMax": { "x": 0.5, "y": 0.5 },
+      "pivot": { "x": 0.5, "y": 0.5 },
+      "style": {
+        "textColor": "#00FFFF",
+        "fontSize": 50
+      }
+    },
+    {
+      "element": "VolumeSlider",
+      "position": { "x": 0, "y": 120 },
+      "size": { "x": 520, "y": 60 },
+      "anchorMin": { "x": 0.5, "y": 0.5 },
+      "anchorMax": { "x": 0.5, "y": 0.5 },
+      "pivot": { "x": 0.5, "y": 0.5 },
+      "style": {
+        "backgroundColor": "#333333"
+      }
+    },
+    {
+      "element": "FullscreenToggle",
+      "position": { "x": 0, "y": 40 },
+      "size": { "x": 520, "y": 60 },
+      "anchorMin": { "x": 0.5, "y": 0.5 },
+      "anchorMax": { "x": 0.5, "y": 0.5 },
+      "pivot": { "x": 0.5, "y": 0.5 },
+      "style": {
+        "backgroundColor": "#333333"
+      }
+    },
+    {
+      "element": "ResolutionDropdown",
+      "position": { "x": 0, "y": -40 },
+      "size": { "x": 520, "y": 60 },
+      "anchorMin": { "x": 0.5, "y": 0.5 },
+      "anchorMax": { "x": 0.5, "y": 0.5 },
+      "pivot": { "x": 0.5, "y": 0.5 },
+      "style": {
+        "backgroundColor": "#333333"
+      }
+    },
+    {
+      "element": "ApplyButton",
+      "position": { "x": 0, "y": -140 },
+      "size": { "x": 320, "y": 70 },
+      "anchorMin": { "x": 0.5, "y": 0.5 },
+      "anchorMax": { "x": 0.5, "y": 0.5 },
+      "pivot": { "x": 0.5, "y": 0.5 },
+      "style": {
+        "backgroundColor": "#00FFFF",
+        "textColor": "#000000",
+        "fontSize": 28
+      }
+    }
+  ]
+}
