@@ -263,6 +263,8 @@ MonoBehaviour:
   fullscreenToggle: {fileID: 843831894}
   volumeSlider: {fileID: 1066489937}
   audioMixer: {fileID: 0}
+  mainMenu: {fileID: 971841817}
+  settingsMenu: {fileID: 1043009952}
 --- !u!4 &410298674
 Transform:
   m_ObjectHideFlags: 0
@@ -1754,6 +1756,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 881d181a3ac8273429f501778b0c1d01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mainMenu: {fileID: 971841817}
+  settingsMenu: {fileID: 1043009952}
 --- !u!4 &1116826981
 Transform:
   m_ObjectHideFlags: 0
@@ -2912,7 +2916,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1665086321}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 410298673}
+        m_TargetAssemblyTypeName: SettingsMenu, Assembly-CSharp
+        m_MethodName: MainMenu
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1665086321
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3033,7 +3049,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1811529887}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1116826980}
+        m_TargetAssemblyTypeName: Control, Assembly-CSharp
+        m_MethodName: Settings
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1811529887
 MonoBehaviour:
   m_ObjectHideFlags: 0

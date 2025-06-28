@@ -12,6 +12,9 @@ public class SettingsMenu : MonoBehaviour
 
     private Resolution[] resolutions;
 
+    public GameObject mainMenu;
+    public GameObject settingsMenu;
+
     void Start()
     {
         // Populate resolution dropdown
@@ -55,5 +58,11 @@ public class SettingsMenu : MonoBehaviour
     {
         Resolution res = resolutions[index];
         Screen.SetResolution(res.width, res.height, Screen.fullScreen);
+    }
+
+    public void MainMenu()
+    {
+        settingsMenu.SetActive(false);
+        mainMenu.SetActive(true);
     }
 }
