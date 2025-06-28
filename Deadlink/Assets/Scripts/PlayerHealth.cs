@@ -1,48 +1,54 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerHealth : MonoBehaviour
 {
-    public int maxHealth = 100;
-    public int currentHealth;
-    public ParticleSystem damageParticles;  // Assign this in Inspector
+    [Header("Health Settings")]
+    public float maxHealth = 100f;
+    private float currentHealth;
 
-    public delegate void OnHealthChanged(int current, int max);
-    public event OnHealthChanged onHealthChanged;
+    [Header("UI")]
+    public Slider healthSlider;
+    public Gradient healthColor;
+    public Image fillImage;
 
-    void Start()
+    private void Start()
     {
         currentHealth = maxHealth;
-        onHealthChanged?.Invoke(currentHealth, maxHealth);
+        UpdateHealthUI();
     }
 
-    public void TakeDamage(int amount)
+    public void TakeDamage(float amount)
     {
         currentHealth -= amount;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-        onHealthChanged?.Invoke(currentHealth, maxHealth);
+        currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+        UpdateHealthUI();
 
-        // Play particles when damaged
-        if (damageParticles != null)
-        {
-            damageParticles.Play();
-        }
-
-        if (currentHealth <= 0)
-        {
+        if (currentHealth <= 0f)
             Die();
-        }
     }
 
-    public void Heal(int amount)
+    public void Heal(float amount)
     {
         currentHealth += amount;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-        onHealthChanged?.Invoke(currentHealth, maxHealth);
+        currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+        UpdateHealthUI();
+    }
+
+    private void UpdateHealthUI()
+    {
+        if (healthSlider != null)
+        {
+            healthSlider.value = currentHealth / maxHealth;
+
+            if (fillImage != null)
+                fillImage.color = healthColor.Evaluate(healthSlider.value);
+        }
     }
 
     private void Die()
     {
-        Debug.Log("Player died.");
-        gameObject.SetActive(false);
+        Debug.Log("Player died!");
+        // Handle death here (e.g., reload scene, respawn, game over UI)
     }
 }

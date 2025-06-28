@@ -2,14 +2,18 @@ using UnityEngine;
 
 public class DamageCube : MonoBehaviour
 {
-    public int damageAmount = 10;
+    public float damageAmount = 25f;
+    public bool destroyAfterHit = false;
 
-    void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        PlayerHealth health = collision.collider.GetComponent<PlayerHealth>();
-        if (health != null)
+        PlayerHealth player = other.GetComponent<PlayerHealth>();
+        if (player != null)
         {
-            health.TakeDamage(damageAmount);
+            player.TakeDamage(damageAmount);
+
+            if (destroyAfterHit)
+                Destroy(gameObject);
         }
     }
 }
